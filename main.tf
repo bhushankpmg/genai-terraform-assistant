@@ -1,58 +1,49 @@
-To create an Azure Storage Account using Terraform, you need to define a configuration file that specifies the provider, resource group, and storage account. Below is a sample Terraform configuration that creates a storage account named 'myuniquestorageacct' in the resource group 'myresourcegroup', located in the 'West Europe' region.
-
-Make sure to replace 'myuniquestorageacct' with a unique name, as Azure requires storage account names to be globally unique.
+To create an Azure Storage Account in a specified resource group using Terraform, you'll need to define the necessary resources in a `.tf` file. Below is a sample Terraform configuration for creating a storage account named `myuniquestorageacct` in the resource group `myresourcegroup` located in the `West Europe` region.
 
 ```hcl
-# main.tf
+# Configure the Azure provider
 provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "example" {
+# Create a resource group
+resource "azurerm_resource_group" "myresourcegroup" {
   name     = "myresourcegroup"
   location = "West Europe"
 }
 
-resource "azurerm_storage_account" "example" {
-  name                     = "myuniquestorageacct" # Storage account name must be in lowercase and globally unique
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
+# Create a storage account
+resource "azurerm_storage_account" "myuniquestorageacct" {
+  name                     = "myuniquestorageacct"
+  resource_group_name      = azurerm_resource_group.myresourcegroup.name
+  location                 = azurerm_resource_group.myresourcegroup.location
   account_tier             = "Standard"
-  account_replication_type = "LRS"
+  account_replication_type = "LRS"  # Locally Redundant Storage
 
   # Optional settings
-  min_tls_version = "TLS1_2"
-  is_hns_enabled  = false
+  # min_tls_version = "TLS1_2"
+}
+
+# Output the storage account name
+output "storage_account_name" {
+  value = azurerm_storage_account.myuniquestorageacct.name
 }
 ```
 
-### Steps to Deploy the Configuration:
+### Explanation of the configuration:
+- **Provider Block**: Specifies the `azurerm` provider which is used to interact with Azure resources.
+- **Resource Group**: Creates a resource group named `myresourcegroup` in `West Europe`.
+- **Storage Account**:
+  - `name`: Must be unique across Azure and is subject to Azure naming conventions (lowercase letters and numbers, 3-24 characters).
+  - `resource_group_name`: References the resource group created earlier.
+  - `location`: The same location as the resource group.
+  - `account_tier`: Sets the performance tier of the storage account to `Standard`.
+  - `account_replication_type`: Specifies the replication strategy (LRS - Locally Redundant Storage).
+- **Output**: Outputs the storage account name after creation.
 
-1. **Install Terraform**: Make sure you have Terraform installed on your machine.
-
-2. **Authenticate with Azure**: Make sure you are authenticated with Azure. You can do this using the Azure CLI:
-   ```bash
-   az login
-   ```
-
-3. **Create a Directory for Your Configuration**: Create a new directory and navigate into it.
-
-4. **Create the Configuration File**: Create a file named `main.tf` and copy the above configuration into it.
-
-5. **Initialize Terraform**: Run the following command to initialize your Terraform working directory:
-   ```bash
-   terraform init
-   ```
-
-6. **Plan the Deployment**: This command will show you what resources will be created without actually creating them:
-   ```bash
-   terraform plan
-   ```
-
-7. **Apply the Configuration**: Run the following command to create the resources:
-   ```bash
-   terraform apply
-   ```
-   You'll be prompted to confirm the action. Type `yes` to proceed.
-
-After these steps, Terraform will provision the resource group and storage account in Azure as specified in the configuration.
+### How to use this configuration:
+1. Install Terraform on your machine if you haven't already.
+2. Save the above configuration in a file named `main.tf`.
+3. Open your terminal and navigate to the directory containing `main.tf`.
+4. Initialize Terraform: `terraform init`
+5. Create a plan to review the resources that will be created
