@@ -1,54 +1,66 @@
-To create a Terraform variables configuration for an Azure Storage Account, you'll want to define some common variables that can be used to specify various properties of the storage account, such as the name, location, resource group, and account tier.
+To create a Terraform variables configuration for an Azure Storage Account, you'll want to define several relevant variables such as the resource group name, storage account name, location, account type, and other settings. Below is an example of how you can structure your `variables.tf` file for an Azure Storage Account.
 
-Here is an example of a `variables.tf` file that defines a set of variables for configuring an Azure Storage Account:
+### Example: `variables.tf`
 
 ```hcl
-# variables.tf
-
 variable "resource_group_name" {
-  description = "The name of the resource group where the storage account will be created."
+  description = "The name of the resource group in which to create the storage account."
   type        = string
 }
 
 variable "storage_account_name" {
-  description = "The name of the storage account. It must be globally unique."
+  description = "The name of the storage account. The name must be between 3 and 24 characters in length and can only include lowercase letters and numbers."
   type        = string
 }
 
 variable "location" {
   description = "The Azure region where the storage account will be created."
   type        = string
-  default     = "East US"  # You can specify a default region or leave it out
+  default     = "East US" # You can change this to any supported Azure region
 }
 
 variable "account_tier" {
-  description = "The performance tier of the storage account."
+  description = "The tier for the storage account. Can be 'Standard' or 'Premium'."
   type        = string
-  default     = "Standard"  # Other options are 'Premium'
+  default     = "Standard"
 }
 
 variable "account_replication_type" {
-  description = "The type of replication for the storage account."
+  description = "The replication type of the storage account. Valid options: LRS, GRS, RA-GRS, GEO-ZRS, etc."
   type        = string
-  default     = "LRS"  # Options include LRS, GRS, RA-GRS, etc.
+  default     = "LRS"
 }
 
-variable "enable_https" {
-  description = "Whether to enable HTTPS for the storage account."
+variable "enable_tls" {
+  description = "Should TLS be enabled for the storage account? This is typically true."
   type        = bool
   default     = true
 }
+
+variable "allow_blob_public_access" {
+  description = "Indicates whether public access is allowed for blob services. Set to false for security."
+  type        = bool
+  default     = false
+}
 ```
 
-### Explanation of each variable:
+### Example: `terraform.tfvars`
 
-- `resource_group_name`: The name of the Azure Resource Group where you want to deploy the storage account.
-- `storage_account_name`: The name of the storage account. Azure requires that storage account names be unique across the globe, and they must be between 3 and 24 characters in length.
-- `location`: The Azure region where the storage account will reside. A default is provided, but you can specify others based on your needs.
-- `account_tier`: The performance tier for the storage account, which can be Standard or Premium.
-- `account_replication_type`: Defines the replication strategy for the storage account, with options like Locally Redundant Storage (LRS) or Geo-Redundant Storage (GRS).
-- `enable_https`: A boolean variable to control whether to enforce HTTPS for accessing the storage account.
+You can define your variable values in a `terraform.tfvars` file like this:
 
-### Usage in main Terraform configuration
+```hcl
+resource_group_name       = "my-resource-group"
+storage_account_name      = "mystorageaccount"
+location                  = "East US"
+account_tier              = "Standard"
+account_replication_type  = "LRS"
+enable_tls                = true
+allow_blob_public_access   = false
+```
 
-You can
+### Usage in `main.tf`
+
+With the variables defined, you can use them when creating the Azure Storage Account resource as follows:
+
+```hcl
+provider "azurerm"
