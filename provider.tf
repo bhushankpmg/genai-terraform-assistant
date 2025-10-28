@@ -1,73 +1,73 @@
-To configure the Azure provider in Terraform, you'll need to set it up in your Terraform configuration files. Below is an example of a basic setup for the Azure provider.
-
-### Step 1: Create a Terraform Configuration File
-
-Create a file named `main.tf` (you can name it differently, but `.tf` is the recommended extension).
-
-Here is a sample configuration for the Azure provider:
+To set up a Terraform provider configuration for Azure, you'll need to specify the Azure Resource Manager (ARM) provider in your Terraform configuration file. Below is a basic example of how to configure the Azure provider in `main.tf`. This example assumes you have Azure CLI installed and you can authenticate using it.
 
 ```hcl
+# main.tf
+
 # Specify the required Terraform version
 terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 2.0"  # Adjust the version as needed
+      version = "~> 3.0" # You can specify the version you need
     }
   }
 
-  required_version = ">= 0.12"
+  required_version = ">= 1.0"
 }
 
-# Configure the Azure provider
+# Configure the Azure Provider
+provider "azurerm" {
+  features {}  # Keep this empty for now - it enables all features
+}
+
+# Example resource: Create a Resource Group
+resource "azurerm_resource_group" "example" {
+  name     = "example-rg"
+  location = "East US"
+}
+```
+
+### Steps to Use This Configuration
+
+1. **Install Terraform**: Make sure you have Terraform installed. You can download it from [terraform.io](https://www.terraform.io/downloads.html).
+
+2. **Authenticate with Azure**: Use the Azure CLI to log in:
+   ```bash
+   az login
+   ```
+
+3. **Create the configuration file**: Save the above example in a file named `main.tf`.
+
+4. **Initialize Terraform**: Navigate to the directory containing `main.tf` and run:
+   ```bash
+   terraform init
+   ```
+
+5. **Plan the deployment**: This command shows you what will be created:
+   ```bash
+   terraform plan
+   ```
+
+6. **Apply the deployment**: Actually create the resources defined in your Terraform file:
+   ```bash
+   terraform apply
+   ```
+
+7. **Confirm the apply**: Type `yes` when prompted to confirm the changes.
+
+### Optional: Configuring Authentication
+
+If you prefer not to use Azure CLI for authentication, you could also configure the provider using service principal credentials. Here's how you would do that:
+
+```hcl
 provider "azurerm" {
   features {}
 
-  # Optionally specify the subscription ID
-  # subscription_id = "your-subscription-id"
-  
-  # Authentication can be done in different ways, e.g., via environment variables or a Service Principal.
-  # If authentication is not done through environment variables, you can specify the client_id, client_secret, tenant_id, etc.
-
-  # client_id       = "your-client-id"
-  # client_secret   = "your-client-secret"
-  # tenant_id       = "your-tenant-id"
+  client_id       = "<YOUR_CLIENT_ID>"
+  client_secret   = "<YOUR_CLIENT_SECRET>"
+  tenant_id       = "<YOUR_TENANT_ID>"
+  subscription_id = "<YOUR_SUBSCRIPTION_ID>"
 }
 ```
 
-### Step 2: Authentication
-
-#### Option 1: Environment Variables
-
-Before running Terraform commands, you can set the following environment variables for Azure authentication:
-
-```bash
-export ARM_CLIENT_ID="<your-client-id>"
-export ARM_CLIENT_SECRET="<your-client-secret>"
-export ARM_TENANT_ID="<your-tenant-id>"
-export ARM_SUBSCRIPTION_ID="<your-subscription-id>"
-```
-
-#### Option 2: Service Principal
-
-You can also create a Service Principal in Azure and use the Application (client) ID, secret, and tenant to authenticate. You'll need to create this SP in the Azure portal or using Azure CLI.
-
-### Step 3: Initialize Terraform and Deploy
-
-Run the following commands to initialize your Terraform configuration and deploy resources:
-
-```bash
-# Initialize your Terraform workspace
-terraform init
-
-# Plan your deployment
-terraform plan
-
-# Apply your configuration
-terraform apply
-```
-
-### Additional Notes
-
-- Ensure that you have the Azure CLI installed and that you are logged in or have a Service Principal with appropriate permissions.
-- The versioning in the provider block can be adjusted based on your needs; check the [Terraform Registry](https://
+Replace the placeholders with your
