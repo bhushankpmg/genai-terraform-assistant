@@ -1,4 +1,4 @@
-To create an Azure Storage Account using Terraform, you can use the following configuration:
+Certainly! Below is a Terraform configuration to create an Azure Storage Account with the specified details:
 
 ```hcl
 provider "azurerm" {
@@ -11,30 +11,34 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_storage_account" "example" {
-  name                     = "myuniquestorageacct" # Must be globally unique 
+  name                     = "myuniquestorageacct" # Storage account name must be globally unique
   resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS" # Locally Redundant Storage
+  location                = azurerm_resource_group.example.location
+  account_tier            = "Standard"
+  account_replication_type = "LRS"
+
+  tags = {
+    Environment = "Demo"
+  }
 }
 ```
 
-### Instructions:
-1. **Install Terraform**: Make sure you have Terraform installed on your machine.
+### Explanation:
+1. **Provider Configuration**: The `provider "azurerm"` block is used to declare that you are using the Azure Resource Manager provider.
 
-2. **Configure Azure Provider**: Ensure that you have access to Azure and have set up authentication using the Azure CLI, Service Principal, or Managed Identity in your environment.
+2. **Resource Group**: The `azurerm_resource_group` resource creates a resource group named `myresourcegroup` in the `West Europe` region.
 
-3. **Create a New Directory**: Create a new directory for your Terraform configuration files.
+3. **Storage Account**: The `azurerm_storage_account` resource is defined to create the storage account:
+    - The `name` attribute is set to the desired unique storage account name, `myuniquestorageacct`.
+    - The `resource_group_name` attribute links the storage account to the previously created resource group.
+    - The `location` attribute specifies where the storage account will be created, using the location of the resource group.
+    - The `account_tier` is set to `Standard`, and the `account_replication_type` is set to `LRS` (Locally Redundant Storage).
+    - The `tags` attribute allows you to apply tags to the storage account for better organization.
 
-4. **Create a File**: Save the above configuration code in a file named `main.tf`.
+### How to Use:
+1. Save the code to a file, e.g., `main.tf`.
+2. Initialize Terraform with `terraform init`.
+3. Validate the configuration with `terraform validate`.
+4. Create the resources with `terraform apply`.
 
-5. **Initialize Terraform**: Run `terraform init` in your terminal while in the directory containing `main.tf`. This command will download the necessary provider plugins.
-
-6. **Plan Your Deployment**: Run `terraform plan` to see what resources will be created.
-
-7. **Apply the Configuration**: Run `terraform apply` to create the resource group and storage account. You will be prompted to confirm the action.
-
-### Notes:
-- Make sure the name of the storage account is unique across Azure, as storage account names must be globally unique.
-- Modify account_tier and account_replication_type as necessary for your requirements.
-- You can add more configurations (like networking rules, blob containers, etc.) as needed.
+Make sure to replace `myuniquestorageacct` with a truly unique name as Azure storage account names must be globally unique. Adjust the `tags` and other settings based on your requirements.
