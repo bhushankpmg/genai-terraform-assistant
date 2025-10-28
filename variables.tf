@@ -1,59 +1,72 @@
-To create a Terraform variables configuration for an Azure Storage Account, you'll typically define variables that will be used to customize the properties of the storage account, such as its name, location, resource group, and other configurations.
+To create a Terraform variables configuration for an Azure Storage Account, you can define variables that allow for the customization of the storage account's properties. Below is an example of how you could set up a `variables.tf` file to include relevant settings for an Azure Storage Account.
 
-Here's an example of a Terraform `variables.tf` file that defines relevant variables for an Azure Storage Account:
+### variables.tf
 
 ```hcl
-# variables.tf
-
 variable "resource_group_name" {
-  description = "The name of the resource group where the storage account will be created."
+  description = "The name of the resource group in which to create the storage account"
   type        = string
-}
-
-variable "location" {
-  description = "The Azure region where the storage account will be located."
-  type        = string
-  default     = "East US"  # You can set your preferred default location
 }
 
 variable "storage_account_name" {
-  description = "The name of the storage account. The name must be between 3 and 24 characters in length and may contain numbers and lower-case letters only."
+  description = "The name of the storage account. Must be globally unique."
   type        = string
+  constraint  = "must match this regex: ^[a-z0-9]{3,24}$" # Storage account naming conventions
 }
 
-variable "account_tier" {
-  description = "The performance tier of the storage account."
+variable "location" {
+  description = "The Azure region where the storage account will be created"
   type        = string
-  default     = "Standard"  # Options: Standard, Premium
+  default     = "East US"
 }
 
-variable "account_replication" {
-  description = "The replication type for the storage account."
+variable "sku" {
+  description = "The SKU (performance tier) of the storage account"
   type        = string
-  default     = "LRS"  # Options: LRS, GRS, RA-GRS, GEO-ZRS, etc.
+  default     = "Standard_LRS"
+}
+
+variable "kind" {
+  description = "The kind of storage account (e.g., BlobStorage, StorageV2)"
+  type        = string
+  default     = "StorageV2"
 }
 
 variable "enable_https_traffic_only" {
-  description = "Indicates whether HTTPS traffic is required for the storage account."
+  description = "Enable HTTPS traffic only"
   type        = bool
   default     = true
 }
 
-variable "void_tiers" {
-  description = "Specifies the access tier for Blob storage (hot, cool, or archive)."
+variable "access_tier" {
+  description = "Access tier for the storage account (Hot or Cool)"
   type        = string
-  default     = "Hot"  # Options: Hot, Cool, Archive
+  default     = "Hot"
 }
 
 variable "tags" {
-  description = "A mapping of tags to assign to the storage account."
+  description = "A map of tags to assign to the storage account"
   type        = map(string)
   default     = {}
 }
 ```
 
-### Explanation of Each Variable:
-1. **resource_group_name**: Name of the Azure resource group where you'll create the storage account.
-2. **location**: The Azure region for the storage account, with a default option provided.
-3. **storage_account_name**: Unique name for the storage account, which must follow Azure naming conventions.
-4. **account_tier**: Defines the performance tier for the
+### Example Usage in a Terraform Configuration
+
+After defining variables, you can use them in your main Terraform configuration file (e.g., `main.tf`) to create the Azure Storage Account as follows:
+
+```hcl
+provider "azurerm" {
+  features {}
+}
+
+resource "azurerm_resource_group" "example" {
+  name     = var.resource_group_name
+  location = var.location
+}
+
+resource "azurerm_storage_account" "example" {
+  name                     = var.storage_account_name
+  resource_group_name      = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier
