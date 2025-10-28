@@ -1,72 +1,85 @@
-To create a Terraform variables configuration for an Azure Storage Account, you can define variables that allow for the customization of the storage account's properties. Below is an example of how you could set up a `variables.tf` file to include relevant settings for an Azure Storage Account.
+Certainly! Below is an example of a Terraform variables configuration to create an Azure Storage Account. This configuration includes typical variables that you might want to configure for such a resource.
 
-### variables.tf
+### Terraform Variables Configuration
+
+Create a file named `variables.tf` and add the following content:
 
 ```hcl
-variable "resource_group_name" {
-  description = "The name of the resource group in which to create the storage account"
-  type        = string
-}
+# variables.tf
 
-variable "storage_account_name" {
-  description = "The name of the storage account. Must be globally unique."
+variable "resource_group_name" {
+  description = "The name of the resource group where the storage account will be created."
   type        = string
-  constraint  = "must match this regex: ^[a-z0-9]{3,24}$" # Storage account naming conventions
 }
 
 variable "location" {
-  description = "The Azure region where the storage account will be created"
+  description = "The Azure region where the storage account will be created."
   type        = string
   default     = "East US"
 }
 
-variable "sku" {
-  description = "The SKU (performance tier) of the storage account"
+variable "storage_account_name" {
+  description = "The name of the storage account. It must be globally unique."
+  type        = string
+}
+
+variable "sku_tier" {
+  description = "The SKU tier of the storage account."
+  type        = string
+  default     = "Standard"
+}
+
+variable "sku_name" {
+  description = "The SKU name of the storage account."
   type        = string
   default     = "Standard_LRS"
 }
 
 variable "kind" {
-  description = "The kind of storage account (e.g., BlobStorage, StorageV2)"
+  description = "The kind of the storage account."
   type        = string
   default     = "StorageV2"
 }
 
 variable "enable_https_traffic_only" {
-  description = "Enable HTTPS traffic only"
+  description = "Indicates whether to require secure transfer to storage accounts."
   type        = bool
   default     = true
 }
 
-variable "access_tier" {
-  description = "Access tier for the storage account (Hot or Cool)"
-  type        = string
-  default     = "Hot"
-}
-
 variable "tags" {
-  description = "A map of tags to assign to the storage account"
+  description = "A mapping of tags to assign to the storage account."
   type        = map(string)
   default     = {}
 }
 ```
 
-### Example Usage in a Terraform Configuration
+### Additional Files Example
 
-After defining variables, you can use them in your main Terraform configuration file (e.g., `main.tf`) to create the Azure Storage Account as follows:
+1. **Provider Configuration (`provider.tf`):**
 
-```hcl
-provider "azurerm" {
-  features {}
-}
+   ```hcl
+   # provider.tf
 
-resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
-  location = var.location
-}
+   provider "azurerm" {
+     features {}
+   }
+   ```
 
-resource "azurerm_storage_account" "example" {
-  name                     = var.storage_account_name
-  resource_group_name      = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier
+2. **Storage Account Resource (`main.tf`):**
+
+   ```hcl
+   # main.tf
+
+   resource "azurerm_resource_group" "example" {
+     name     = var.resource_group_name
+     location = var.location
+   }
+
+   resource "azurerm_storage_account" "example" {
+     name                     = var.storage_account_name
+     resource_group_name      = azurerm_resource_group.example.name
+     location                 = azurerm_resource_group.example.location
+     account_tier            = var.sku_tier
+     account_replication_type = var.sku_name
+     kind                     = var
