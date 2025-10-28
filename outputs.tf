@@ -1,7 +1,6 @@
-In Azure, when you create a Storage Account using an Infrastructure as Code tool like ARM templates, Terraform, or Bicep, you can define outputs that capture the Storage Account ID and endpoint. The specific syntax will depend on the tool you're using. Below are examples for ARM templates, Terraform, and Bicep.
+In Azure, when you create a Storage Account using an Azure Resource Manager (ARM) template, you can specify outputs to capture important attributes of the resource, such as its ID and endpoint. Below is an example of how to define outputs for an Azure Storage Account that captures its ID and endpoint.
 
-### ARM Template Example
-In an ARM template, you can define an output section to capture the Storage Account ID and endpoint as follows:
+Assuming you already have a Storage Account resource defined in your ARM template, you can add the following outputs section to your template:
 
 ```json
 {
@@ -25,38 +24,27 @@ In an ARM template, you can define an output section to capture the Storage Acco
       "type": "string",
       "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
     },
-    "storageAccountEndpoint": {
+    "primaryEndpoint": {
       "type": "string",
-      "value": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net/')]"
+      "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))).primaryEndpoints.blob]"
+    },
+    "secondaryEndpoint": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))).primaryEndpoints.queue]"
     }
-  }
+  } 
 }
 ```
 
-### Terraform Example
-In Terraform, you can define outputs to capture the Storage Account ID and endpoint like this:
+### Explanation:
 
-```hcl
-resource "azurerm_storage_account" "example" {
-  name                     = var.storage_account_name
-  resource_group_name     = azurerm_resource_group.example.name
-  location                 = azurerm_resource_group.example.location
-  account_tier            = "Standard"
-  account_replication_type = "LRS"
-}
+1. **Outputs Section**: The `outputs` section holds the values you want to expose after the deployment of the ARM template.
 
-output "storage_account_id" {
-  value = azurerm_storage_account.example.id
-}
+2. **Storage Account ID**:
+   - The output named `storageAccountId` captures the ID of the Storage Account using the `resourceId` function which constructs the full resource ID of the specified storage account.
 
-output "storage_account_endpoint" {
-  value = "https://${azurerm_storage_account.example.name}.blob.core.windows.net/"
-}
-```
+3. **Primary Endpoint**:
+   - The output named `primaryEndpoint` retrieves the primary blob endpoint of the Storage Account using the `reference` function, which returns the resource model for the specified resource. We access the `primaryEndpoints.blob` property to get the blob service endpoint.
 
-### Bicep Example
-In Bicep, you can define outputs in a similar manner as follows:
-
-```bicep
-resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
-  name     : 'myuni
+4. **Secondary Endpoint**:
+   - The output named `secondaryEndpoint` this can vary based on the service type
