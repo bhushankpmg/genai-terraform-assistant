@@ -1,6 +1,6 @@
-In Azure, when you create a Storage Account using an Azure Resource Manager (ARM) template, you can specify outputs to capture important attributes of the resource, such as its ID and endpoint. Below is an example of how to define outputs for an Azure Storage Account that captures its ID and endpoint.
+In Azure, to define outputs for a Storage Account that capture its ID and endpoint, you typically use an Azure Resource Manager (ARM) template. The output section of the ARM template allows you to define values that can be returned after the deployment is completed.
 
-Assuming you already have a Storage Account resource defined in your ARM template, you can add the following outputs section to your template:
+Here’s how you can structure your ARM template to include outputs for the Storage Account ID and the primary endpoint:
 
 ```json
 {
@@ -9,16 +9,42 @@ Assuming you already have a Storage Account resource defined in your ARM templat
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2021-04-01",
+      "apiVersion": "2021-02-01",
       "name": "[parameters('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "Standard_LRS"
+        "name": "[parameters('skuName')]"
       },
-      "kind": "StorageV2",
+      "kind": "[parameters('kind')]",
       "properties": {}
     }
   ],
+  "parameters": {
+    "storageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the storage account"
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Location for the storage account"
+      }
+    },
+    "skuName": {
+      "type": "string",
+      "metadata": {
+        "description": "SKU of the storage account"
+      }
+    },
+    "kind": {
+      "type": "string",
+      "metadata": {
+        "description": "Kind of storage account (e.g., StorageV2)"
+      }
+    }
+  },
   "outputs": {
     "storageAccountId": {
       "type": "string",
@@ -27,24 +53,12 @@ Assuming you already have a Storage Account resource defined in your ARM templat
     "primaryEndpoint": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))).primaryEndpoints.blob]"
-    },
-    "secondaryEndpoint": {
-      "type": "string",
-      "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))).primaryEndpoints.queue]"
     }
-  } 
+  }
 }
 ```
 
-### Explanation:
+### Explanation of Outputs:
+1. **storageAccountId**: This output uses the `resourceId` function to dynamically generate the resource ID of the storage account based on the name provided in the parameters.
 
-1. **Outputs Section**: The `outputs` section holds the values you want to expose after the deployment of the ARM template.
-
-2. **Storage Account ID**:
-   - The output named `storageAccountId` captures the ID of the Storage Account using the `resourceId` function which constructs the full resource ID of the specified storage account.
-
-3. **Primary Endpoint**:
-   - The output named `primaryEndpoint` retrieves the primary blob endpoint of the Storage Account using the `reference` function, which returns the resource model for the specified resource. We access the `primaryEndpoints.blob` property to get the blob service endpoint.
-
-4. **Secondary Endpoint**:
-   - The output named `secondaryEndpoint` this can vary based on the service type
+2. **primaryEndpoint**: This output retrieves the primary blob service endpoint of the storage account by using the
