@@ -1,6 +1,8 @@
-To define outputs for an Azure Storage Account that capture its ID and endpoint, you will typically include these in an Azure Resource Manager (ARM) template. Outputs in an ARM template allow you to return values once the deployment is complete.
+In an Azure Storage Account, you can define outputs in a deployment template (such as an ARM template or Bicep file) to capture the storage account's properties, including its ID and endpoint. Below is an example of how to define these outputs in an ARM template and a Bicep file.
 
-Here’s a sample ARM template snippet that defines the outputs you are looking for:
+### ARM Template Example
+
+Here's how you can define outputs in an ARM template:
 
 ```json
 {
@@ -13,8 +15,7 @@ Here’s a sample ARM template snippet that defines the outputs you are looking 
       "name": "[parameters('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[parameters('storageAccountSku')]",
-        "tier": "[parameters('storageAccountTier')]"
+        "name": "Standard_LRS"
       },
       "kind": "StorageV2",
       "properties": {}
@@ -29,32 +30,37 @@ Here’s a sample ARM template snippet that defines the outputs you are looking 
       "type": "string",
       "value": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net')]"
     }
-  },
-  "parameters": {
-    "storageAccountName": {
-      "type": "string"
-    },
-    "location": {
-      "type": "string"
-    },
-    "storageAccountSku": {
-      "type": "string",
-      "defaultValue": "Standard_LRS"
-    },
-    "storageAccountTier": {
-      "type": "string",
-      "defaultValue": "Standard"
-    }
   }
 }
 ```
 
-### Explanation:
+### Bicep Example
 
-- **Storage Account Resource**: The `"resources"` section creates a Storage Account resource with parameters.
-- **Outputs Section**: 
-  - **`storageAccountId`**: This captures the unique resource ID of the storage account using the `resourceId` function, which constructs the ID based on the resource type and name.
-  - **`storageAccountEndpoint`**: This constructs the Blob service endpoint URL using string concatenation. The endpoint generally takes the form of `https://<storageAccountName>.blob.core.windows.net`.
+Here's how you can define outputs in a Bicep file:
+
+```bicep
+param storageAccountName string
+param location string
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
+  name: storageAccountName
+  location: location
+  sku: {
+    name: 'Standard_LRS'
+  }
+  kind: 'StorageV2'
+}
+
+output storageAccountId string = storageAccount.id
+output storageAccountEndpoint string = 'https://${storageAccountName}.blob.core.windows.net'
+```
+
+### Fields Explained
+
+- **storageAccountId**: This output captures the ID of the storage account, which is useful for referencing the resource in other deployments or for integration with other resources.
   
-### Parameters Section:
-- The `"parameters
+- **storageAccountEndpoint**: This output constructs the endpoint URL for the Blob service of the storage account, which can be used to access the blobs stored in that account.
+
+### Usage
+
+When you deploy these templates, the outputs will be available in the deployment
