@@ -1,4 +1,7 @@
-In Azure, when you create a storage account using an Azure Resource Manager (ARM) template, you can define outputs to capture specific properties of the resources you have created. To capture the storage account's ID and endpoint, you can define outputs in the ARM template as follows:
+In Azure, when you create a Storage Account using an Infrastructure as Code tool like ARM templates, Terraform, or Bicep, you can define outputs that capture the Storage Account ID and endpoint. The specific syntax will depend on the tool you're using. Below are examples for ARM templates, Terraform, and Bicep.
+
+### ARM Template Example
+In an ARM template, you can define an output section to capture the Storage Account ID and endpoint as follows:
 
 ```json
 {
@@ -11,8 +14,7 @@ In Azure, when you create a storage account using an Azure Resource Manager (ARM
       "name": "[parameters('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[parameters('skuName')]",
-        "tier": "[parameters('skuTier')]"
+        "name": "Standard_LRS"
       },
       "kind": "StorageV2",
       "properties": {}
@@ -25,39 +27,36 @@ In Azure, when you create a storage account using an Azure Resource Manager (ARM
     },
     "storageAccountEndpoint": {
       "type": "string",
-      "value": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net')]"
-    }
-  },
-  "parameters": {
-    "storageAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the Storage Account"
-      }
-    },
-    "location": {
-      "type": "string",
-      "metadata": {
-        "description": "Location for the Storage Account"
-      }
-    },
-    "skuName": {
-      "type": "string",
-      "metadata": {
-        "description": "SKU name for the Storage Account"
-      }
-    },
-    "skuTier": {
-      "type": "string",
-      "metadata": {
-        "description": "SKU tier for the Storage Account"
-      }
+      "value": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net/')]"
     }
   }
 }
 ```
 
-### Explanation:
-- **Outputs Section**: This section defines two outputs:
-  - `storageAccountId`: This output captures the ID of the storage account resource. The `resourceId` function is used to construct the full resource ID based on the resource type and the parameters provided.
-  - `storageAccountEndpoint`: This output constructs the blob endpoint URL for the storage account using
+### Terraform Example
+In Terraform, you can define outputs to capture the Storage Account ID and endpoint like this:
+
+```hcl
+resource "azurerm_storage_account" "example" {
+  name                     = var.storage_account_name
+  resource_group_name     = azurerm_resource_group.example.name
+  location                 = azurerm_resource_group.example.location
+  account_tier            = "Standard"
+  account_replication_type = "LRS"
+}
+
+output "storage_account_id" {
+  value = azurerm_storage_account.example.id
+}
+
+output "storage_account_endpoint" {
+  value = "https://${azurerm_storage_account.example.name}.blob.core.windows.net/"
+}
+```
+
+### Bicep Example
+In Bicep, you can define outputs in a similar manner as follows:
+
+```bicep
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-04-01' = {
+  name     : 'myuni
