@@ -1,84 +1,73 @@
-To configure the Azure provider in Terraform, you'll need to specify the provider and its required version in your Terraform configuration. Below is a basic example of how to set up the Azure provider in a Terraform configuration file.
+To configure the Azure provider in Terraform, you'll need to set it up in your Terraform configuration files. Below is an example of a basic setup for the Azure provider.
 
-1. **Create a directory for your Terraform configuration:**
+### Step 1: Create a Terraform Configuration File
 
-   ```
-   mkdir terraform-azure
-   cd terraform-azure
-   ```
+Create a file named `main.tf` (you can name it differently, but `.tf` is the recommended extension).
 
-2. **Create a Terraform configuration file, e.g., `main.tf`:**
+Here is a sample configuration for the Azure provider:
 
-   ```hcl
-   # Specify the required Terraform version
-   terraform {
-     required_providers {
-       azurerm = {
-         source  = "hashicorp/azurerm"
-         version = "~> 3.0"  # Replace with the desired version
-       }
-     }
+```hcl
+# Specify the required Terraform version
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 2.0"  # Adjust the version as needed
+    }
+  }
 
-     required_version = ">= 1.0"
-   }
+  required_version = ">= 0.12"
+}
 
-   # Configure the Azure provider
-   provider "azurerm" {
-     features {}  # Required features block (can be left empty)
-   }
+# Configure the Azure provider
+provider "azurerm" {
+  features {}
 
-   # Example resource: Create a resource group
-   resource "azurerm_resource_group" "example" {
-     name     = "example-resource-group"
-     location = "East US"
-   }
-   ```
+  # Optionally specify the subscription ID
+  # subscription_id = "your-subscription-id"
+  
+  # Authentication can be done in different ways, e.g., via environment variables or a Service Principal.
+  # If authentication is not done through environment variables, you can specify the client_id, client_secret, tenant_id, etc.
 
-3. **Initialize the Terraform configuration:**
+  # client_id       = "your-client-id"
+  # client_secret   = "your-client-secret"
+  # tenant_id       = "your-tenant-id"
+}
+```
 
-   Run the following command in your terminal:
+### Step 2: Authentication
 
-   ```sh
-   terraform init
-   ```
+#### Option 1: Environment Variables
 
-   This command initializes the Terraform configuration and downloads the necessary provider plugins.
+Before running Terraform commands, you can set the following environment variables for Azure authentication:
 
-4. **Authentication:**
+```bash
+export ARM_CLIENT_ID="<your-client-id>"
+export ARM_CLIENT_SECRET="<your-client-secret>"
+export ARM_TENANT_ID="<your-tenant-id>"
+export ARM_SUBSCRIPTION_ID="<your-subscription-id>"
+```
 
-   To authenticate with Azure, you can use one of several methods. The most common method for local development is using the Azure CLI:
+#### Option 2: Service Principal
 
-   1. Log in to your Azure account using the Azure CLI:
+You can also create a Service Principal in Azure and use the Application (client) ID, secret, and tenant to authenticate. You'll need to create this SP in the Azure portal or using Azure CLI.
 
-      ```sh
-      az login
-      ```
+### Step 3: Initialize Terraform and Deploy
 
-   2. Ensure that you have set the correct subscription context if you have multiple subscriptions:
+Run the following commands to initialize your Terraform configuration and deploy resources:
 
-      ```sh
-      az account set --subscription "Your Subscription Name"
-      ```
+```bash
+# Initialize your Terraform workspace
+terraform init
 
-   Alternatively, you can set the following environment variables to authenticate using a service principal:
+# Plan your deployment
+terraform plan
 
-   ```sh
-   export ARM_CLIENT_ID="your-client-id"
-   export ARM_CLIENT_SECRET="your-client-secret"
-   export ARM_SUBSCRIPTION_ID="your-subscription-id"
-   export ARM_TENANT_ID="your-tenant-id"
-   ```
+# Apply your configuration
+terraform apply
+```
 
-5. **Plan and apply your configuration:**
+### Additional Notes
 
-   You can generate an execution plan using:
-
-   ```sh
-   terraform plan
-   ```
-
-   If everything looks good, you can apply the configuration:
-
-   ```sh
-   terraform apply
-   ```
+- Ensure that you have the Azure CLI installed and that you are logged in or have a Service Principal with appropriate permissions.
+- The versioning in the provider block can be adjusted based on your needs; check the [Terraform Registry](https://
