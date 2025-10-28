@@ -1,71 +1,59 @@
-Certainly! Below is an example of a Terraform variables configuration file (`variables.tf`) for provisioning an Azure Storage Account. This configuration includes parameters such as the storage account name, resource group name, location, SKU, and kind.
+To create a Terraform variables configuration for an Azure Storage Account, you'll typically define variables that will be used to customize the properties of the storage account, such as its name, location, resource group, and other configurations.
 
-### `variables.tf`
+Here's an example of a Terraform `variables.tf` file that defines relevant variables for an Azure Storage Account:
 
 ```hcl
+# variables.tf
+
 variable "resource_group_name" {
   description = "The name of the resource group where the storage account will be created."
   type        = string
 }
 
 variable "location" {
-  description = "The Azure region where the resource group and storage account will be created."
+  description = "The Azure region where the storage account will be located."
   type        = string
-  default     = "East US"  # You can change the default to your preferred location
+  default     = "East US"  # You can set your preferred default location
 }
 
 variable "storage_account_name" {
-  description = "The name of the storage account. Must be between 3 and 24 characters in length and can only contain lowercase letters and numbers."
+  description = "The name of the storage account. The name must be between 3 and 24 characters in length and may contain numbers and lower-case letters only."
   type        = string
 }
 
 variable "account_tier" {
-  description = "The tier of the storage account."
+  description = "The performance tier of the storage account."
   type        = string
-  default     = "Standard"  # Options can be "Standard" or "Premium"
+  default     = "Standard"  # Options: Standard, Premium
 }
 
-variable "account_kind" {
-  description = "The kind of storage account."
+variable "account_replication" {
+  description = "The replication type for the storage account."
   type        = string
-  default     = "StorageV2"  # Other options can include "Storage", "BlobStorage", etc.
+  default     = "LRS"  # Options: LRS, GRS, RA-GRS, GEO-ZRS, etc.
 }
 
 variable "enable_https_traffic_only" {
-  description = "Whether to allow only secure HTTPS traffic to the storage account."
+  description = "Indicates whether HTTPS traffic is required for the storage account."
   type        = bool
   default     = true
 }
-```
 
-### Example Usage (`main.tf`)
-
-You would typically use these variables in your main Terraform configuration file, where you define the actual resources:
-
-```hcl
-provider "azurerm" {
-  features {}
+variable "void_tiers" {
+  description = "Specifies the access tier for Blob storage (hot, cool, or archive)."
+  type        = string
+  default     = "Hot"  # Options: Hot, Cool, Archive
 }
 
-resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
-  location = var.location
-}
-
-resource "azurerm_storage_account" "example" {
-  name                     = var.storage_account_name
-  resource_group_name     = azurerm_resource_group.example.name
-  location                = azurerm_resource_group.example.location
-  account_tier            = var.account_tier
-  account_kind            = var.account_kind
-  enable_https_traffic_only = var.enable_https_traffic_only
-
-  tags = {
-    Environment = "Terraform"
-  }
+variable "tags" {
+  description = "A mapping of tags to assign to the storage account."
+  type        = map(string)
+  default     = {}
 }
 ```
 
-### Example Input Values (`terraform.tfvars`)
-
-You can specify the values for these variables in a separate
+### Explanation of Each Variable:
+1. **resource_group_name**: Name of the Azure resource group where you'll create the storage account.
+2. **location**: The Azure region for the storage account, with a default option provided.
+3. **storage_account_name**: Unique name for the storage account, which must follow Azure naming conventions.
+4. **account_tier**: Defines the performance tier for the
