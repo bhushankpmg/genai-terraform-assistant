@@ -1,4 +1,4 @@
-Certainly! Below is an example of a Terraform configuration file that creates an Azure Storage Account with the name `myuniquestorageacct` in a resource group called `myresourcegroup`, located in `West Europe`.
+To create an Azure Storage Account using Terraform, you'll need to define a Terraform configuration file that specifies the resource group, storage account, and any necessary properties. Below is an example of a Terraform configuration that meets your requirements:
 
 ```hcl
 provider "azurerm" {
@@ -11,56 +11,56 @@ resource "azurerm_resource_group" "example" {
 }
 
 resource "azurerm_storage_account" "example" {
-  name                     = "myuniquestorageacct"  # Storage account must be globally unique
+  name                     = "myuniquestorageacct" # The name must be globally unique
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"  # Locally redundant storage
+  account_tier            = "Standard"
+  account_replication_type = "LRS" # Locally Redundant Storage
 
-  # Optional: Specify additional settings based on your requirements
-  enable_https_traffic_only = true
-  
+  # Optional: Enable HTTPS traffic only
+  min_tls_version = "TLS1_2"
+
   tags = {
-    Environment = "Dev"
-    Project     = "MyProject"
+    environment = "testing"
   }
 }
 ```
 
-### Instructions to Use the Configuration
+### Steps to Use the Configuration:
 
-1. **Installation**: 
-   Make sure you have Terraform installed. You can download it from the [Terraform website](https://www.terraform.io/downloads.html).
+1. **Install Terraform:** Ensure that Terraform is installed on your local machine. You can download it from [terraform.io](https://www.terraform.io/downloads.html).
 
-2. **Authentication**: 
-   You need to be authenticated with Azure. You can do this using the Azure CLI or by setting the environment variables for your service principal.
+2. **Create a Directory:** Create a new directory to hold your Terraform configuration file.
 
    ```bash
-   az login  # Log in using Azure CLI
+   mkdir azure-storage-account
+   cd azure-storage-account
    ```
 
-3. **Initialize Terraform**:
-   Create a directory for your Terraform configuration, and save the above code in a file named `main.tf`. Then run:
+3. **Create a Configuration File:** Create a file named `main.tf` and copy the above Terraform configuration into this file.
+
+4. **Initialize Terraform:** Run the following command in your terminal to initialize Terraform. This will download the required provider plugins:
+
    ```bash
    terraform init
    ```
 
-4. **Plan the Infrastructure**:
-   Generate an execution plan to see what Terraform will do:
+5. **Plan the Deployment:** To see what resources will be created, run:
+
    ```bash
    terraform plan
    ```
 
-5. **Apply the Configuration**:
-   Create the resources defined in your configuration:
+6. **Apply the Configuration:** To create the resources specified in your configuration, run:
+
    ```bash
    terraform apply
    ```
 
-6. **Confirm Changes**:
-   When prompted, type `yes` to proceed with the creation of resources.
+   Confirm the action when prompted.
 
-### Notes
-- Ensure that the name of the storage account is unique in Azure. If `myuniquestorageacct` is already taken, you will need to change it to something else.
-- Adjust the `account_tier` and `account_replication_type` as needed based on your application's requirements.
-- Add any
+7. **Check the Azure Portal:** After the process completes, you can check the Azure Portal to see the created storage account under the specified resource group.
+
+### Note:
+- The name of the storage account must be globally unique across Azure. Ensure that `myuniquestorageacct` is not already in use. You can modify the name with a unique suffix if necessary.
+- This configuration uses standard locally redundant storage (LRS) and enables
