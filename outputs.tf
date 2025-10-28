@@ -1,6 +1,6 @@
-In Azure, to define outputs for a Storage Account that capture its ID and endpoint, you typically use an Azure Resource Manager (ARM) template. The output section of the ARM template allows you to define values that can be returned after the deployment is completed.
+To define outputs for an Azure Storage Account that capture its ID and endpoint, you will typically include these in an Azure Resource Manager (ARM) template. Outputs in an ARM template allow you to return values once the deployment is complete.
 
-Here’s how you can structure your ARM template to include outputs for the Storage Account ID and the primary endpoint:
+Here’s a sample ARM template snippet that defines the outputs you are looking for:
 
 ```json
 {
@@ -9,56 +9,52 @@ Here’s how you can structure your ARM template to include outputs for the Stor
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "apiVersion": "2021-02-01",
+      "apiVersion": "2021-04-01",
       "name": "[parameters('storageAccountName')]",
       "location": "[parameters('location')]",
       "sku": {
-        "name": "[parameters('skuName')]"
+        "name": "[parameters('storageAccountSku')]",
+        "tier": "[parameters('storageAccountTier')]"
       },
-      "kind": "[parameters('kind')]",
+      "kind": "StorageV2",
       "properties": {}
     }
   ],
-  "parameters": {
-    "storageAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the storage account"
-      }
-    },
-    "location": {
-      "type": "string",
-      "metadata": {
-        "description": "Location for the storage account"
-      }
-    },
-    "skuName": {
-      "type": "string",
-      "metadata": {
-        "description": "SKU of the storage account"
-      }
-    },
-    "kind": {
-      "type": "string",
-      "metadata": {
-        "description": "Kind of storage account (e.g., StorageV2)"
-      }
-    }
-  },
   "outputs": {
     "storageAccountId": {
       "type": "string",
       "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
     },
-    "primaryEndpoint": {
+    "storageAccountEndpoint": {
       "type": "string",
-      "value": "[reference(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))).primaryEndpoints.blob]"
+      "value": "[concat('https://', parameters('storageAccountName'), '.blob.core.windows.net')]"
+    }
+  },
+  "parameters": {
+    "storageAccountName": {
+      "type": "string"
+    },
+    "location": {
+      "type": "string"
+    },
+    "storageAccountSku": {
+      "type": "string",
+      "defaultValue": "Standard_LRS"
+    },
+    "storageAccountTier": {
+      "type": "string",
+      "defaultValue": "Standard"
     }
   }
 }
 ```
 
-### Explanation of Outputs:
-1. **storageAccountId**: This output uses the `resourceId` function to dynamically generate the resource ID of the storage account based on the name provided in the parameters.
+### Explanation:
 
-2. **primaryEndpoint**: This output retrieves the primary blob service endpoint of the storage account by using the
+- **Storage Account Resource**: The `"resources"` section creates a Storage Account resource with parameters.
+- **Outputs Section**: 
+  - **`storageAccountId`**: This captures the unique resource ID of the storage account using the `resourceId` function, which constructs the ID based on the resource type and name.
+  - **`storageAccountEndpoint`**: This constructs the Blob service endpoint URL using string concatenation. The endpoint generally takes the form of `https://<storageAccountName>.blob.core.windows.net`.
+  
+### Parameters Section:
+- The `"parameters
