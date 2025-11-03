@@ -1,1 +1,8 @@
-It seems like you're mentioning the name of an Amazon S3 bucket, which is `abcdefghijlsbd`. If you have any specific questions or tasks related to this bucket, such as how to upload files, manage permissions, set up versioning, or anything else, please let me know! I'm here to help.
+resource "aws_s3_bucket" "my_bucket" {
+  bucket = "my-unique-bucket-name"  # Change to a unique bucket name
+  acl    = "private"
+
+  tags = {
+    Name        = "MyS3Bucket"
+    Environment = "production"
+  }
