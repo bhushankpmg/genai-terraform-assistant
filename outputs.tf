@@ -1,3 +1,3 @@
-output "bucket_name" {
-  value = aws_s3_bucket.my_bucket.bucket
+output "storage_account_name" {
+  value = azurerm_storage_account.example.name
 }
