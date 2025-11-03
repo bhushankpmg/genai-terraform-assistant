@@ -1,5 +1,3 @@
-providers {
-       azurerm = {
-         source  = "hashicorp/azurerm"
-         version = "~> 2.0"  # Ensure you use a compatible version
-       }
+provider "aws" {
+     region = "us-west-2"  # Change the region as needed
+   }
