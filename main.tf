@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "my_bucket" {
-  bucket = "my-unique-bucket-name"  # Ensure this name is globally unique
+  bucket = "my-unique-s3-bucket-name" # Replace with a unique bucket name
   acl    = "private"
 
   tags = {
