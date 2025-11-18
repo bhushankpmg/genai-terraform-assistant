@@ -1,5 +1,0 @@
-Sure! Here's a short and friendly text you can use for `abc.txt`:
-
-```
-Hello there! Keep smiling and have a wonderful day! 😊
-```
