@@ -1,0 +1,1 @@
+resource "azurerm_storage_account" "this" { name = "aistub" resource_group_name = "rg" location = "eastus" }
